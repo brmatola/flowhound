@@ -58,6 +58,7 @@ services:
     container_name: flowhound_pmacct_prometheus_exporter
     environment:
       - KAFKA_BROKER=redpanda:9092
+      - PYTHONUNBUFFERED=1
     restart: unless-stopped
     depends_on:
       - redpanda
