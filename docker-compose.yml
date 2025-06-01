@@ -45,7 +45,7 @@ services:
     ports:
       - "3000:3000"
     volumes:
-      - ./grafana/data:/var/lib/grafana
+      - grafana-data:/var/lib/grafana
       - ./grafana/dashboards:/var/lib/grafana/dashboards
       - ./grafana/provisioning:/etc/grafana/provisioning
     environment:
@@ -61,3 +61,6 @@ services:
     restart: unless-stopped
     depends_on:
       - redpanda
+
+volumes:
+  grafana-data:
