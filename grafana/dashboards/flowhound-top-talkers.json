@@ -47,7 +47,7 @@
         "targets": [
           {
             "expr": "topk(${topn}, increase(pmacct_traffic_bytes_total_by_src_host[$__range]))",
-            "legendFormat": "{{src_host}}",
+            "legendFormat": "{{src_ip}}",
             "refId": "A"
           }
         ],

@@ -2,6 +2,9 @@ global:
   scrape_interval: 15s
   scrape_timeout: 10s
 
+rule_files:
+  - "pmacct_rules.yml"
+
 scrape_configs:
   - job_name: 'pmacct_prometheus_exporter'
     static_configs:
