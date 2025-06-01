@@ -36,7 +36,7 @@ def main():
             print(f"Skipping message: {data}")
             continue
 
-        src_mac = data.get("src_mac", "unknown")
+        src_mac = data.get("mac_src", "unknown")
         src_ip = data.get("ip_src", "unknown")
         dst_ip = data.get("ip_dst", "unknown")
         bytes = data.get("bytes", 0)
