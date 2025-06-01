@@ -1,0 +1,63 @@
+version: '3.8'
+
+services:
+
+  pmacctd:
+    image: pmacct/pmacct:latest
+    container_name: flowhound_pmacctd
+    network_mode: host
+    volumes:
+      - ./pmacctd.conf:/etc/pmacct/pmacctd.conf
+  
+  redpanda:
+    image: redpandadata/redpanda:v25.1.4-arm64
+    container_name: flowhound_redpanda
+    ports:
+      - "9092:9092"
+    command:
+      - redpanda
+      - start
+      - --check=false
+      - --overprovisioned
+      - --smp=1
+      - --memory=1G
+      - --reserve-memory=0M
+      - --node-id=0
+      - --kafka-addr=0.0.0.0:9092
+      - --advertise-kafka-addr=192.168.0.126:9092
+    restart: unless-stopped
+
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: flowhound_prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus:/etc/prometheus
+    command:
+      - --config.file=/etc/prometheus/prometheus.yml
+      - --storage.tsdb.retention.time=15d
+    restart: unless-stopped
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: flowhound_grafana
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./grafana/data:/var/lib/grafana
+      - ./grafana/dashboards:/var/lib/grafana/dashboards
+      - ./grafana/provisioning:/etc/grafana/provisioning
+    environment:
+      - GF_DASHBOARDS_DEFAULT_HOME_DASHBOARD_PATH=/var/lib/grafana/dashboards/flowhound-top-talkers.json
+    restart: unless-stopped
+  
+  pmacct_prometheus_exporter:
+    build: ./pmacct_prometheus_exporter
+    container_name: flowhound_pmacct_prometheus_exporter
+    network_mode: host
+    environment:
+      - KAFKA_BROKER=redpanda:9092
+    restart: unless-stopped
+    depends_on:
+      - redpanda

@@ -1,0 +1,10 @@
+groups:
+- name: pmacct_traffic.rules
+  interval: 1m
+  rules:
+    - record: pmacct_traffic_bytes_total_by_mac
+      expr: sum(increase(pmacct_traffic_bytes_total[1m])) by (src_mac)
+    - record: pmacct_traffic_bytes_total_by_src_ip
+      expr: sum(increase(pmacct_traffic_bytes_total[1m])) by (src_ip)
+    - record: pmacct_traffic_bytes_total_by_dst_ip
+      expr: sum(increase(pmacct_traffic_bytes_total[1m])) by (dst_ip)
