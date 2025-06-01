@@ -7,7 +7,7 @@ services:
     container_name: flowhound_pmacctd
     network_mode: host
     volumes:
-      - ./pmacctd.conf:/etc/pmacct/pmacctd.conf
+      - ./pmacctd.conf:/etc/pmacct/sfacctd.conf
   
   redpanda:
     image: redpandadata/redpanda:v25.1.4-arm64
