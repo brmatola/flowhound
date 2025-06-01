@@ -4,7 +4,7 @@ import time
 from kafka import KafkaConsumer
 from prometheus_client import start_http_server, Gauge
 
-KAFKA_BROKER = os.getenv("KAFKA_BROKER", "localhost:9092")
+KAFKA_BROKER = os.getenv("KAFKA_BROKER", "redpanda:9092")
 KAFKA_TOPIC = "pmacct_flows"
 
 traffic_metric = Gauge(
@@ -33,6 +33,7 @@ def main():
     for message in consumer:
         data = message.value
         if data.get("event_type") != "purge":
+            print(f"Skipping message: {data}")
             continue
 
         src_mac = data.get("src_mac", "unknown")
