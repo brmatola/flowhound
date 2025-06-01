@@ -56,6 +56,8 @@ services:
   pmacct_prometheus_exporter:
     build: ./pmacct_prometheus_exporter
     container_name: flowhound_pmacct_prometheus_exporter
+    ports:
+      - "9105:9105"
     environment:
       - KAFKA_BROKER=redpanda:9092
       - PYTHONUNBUFFERED=1
