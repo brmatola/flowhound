@@ -3,6 +3,7 @@ import os
 import time
 from kafka import KafkaConsumer
 from prometheus_client import start_http_server, Gauge
+from ip import get_direction
 
 KAFKA_BROKER = os.getenv("KAFKA_BROKER", "redpanda:9092")
 KAFKA_TOPIC = "pmacct_flows"
@@ -10,7 +11,7 @@ KAFKA_TOPIC = "pmacct_flows"
 traffic_metric = Gauge(
     "pmacct_traffic_bytes_total",
     "Total bytes observed per flow",
-    ["src_mac", "src_ip", "dst_ip"]
+    ["src_mac", "src_ip", "dst_ip", "direction"]
 )
 
 
@@ -39,12 +40,14 @@ def main():
         src_mac = data.get("mac_src", "unknown")
         src_ip = data.get("ip_src", "unknown")
         dst_ip = data.get("ip_dst", "unknown")
+        direction = get_direction(src_ip, dst_ip)
         bytes = data.get("bytes", 0)
 
         traffic_metric.labels(
             src_mac=src_mac,
             src_ip=src_ip,
-            dst_ip=dst_ip
+            dst_ip=dst_ip,
+            direction=direction,
         ).set(bytes)
 
 
