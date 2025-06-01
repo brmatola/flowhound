@@ -46,7 +46,7 @@
         "title": "Top ${topn} Source IPs",
         "targets": [
           {
-            "expr": "topk(${topn}, increase(pmacct_traffic_bytes_total_by_src_host[$__range]))",
+            "expr": "topk(${topn}, increase(pmacct_traffic_bytes_total_by_src_ip[$__range]))",
             "legendFormat": "{{src_ip}}",
             "refId": "A"
           }
