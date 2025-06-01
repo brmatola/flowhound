@@ -36,8 +36,8 @@ def main():
             continue
 
         src_mac = data.get("src_mac", "unknown")
-        src_ip = data.get("src_host", "unknown")
-        dst_ip = data.get("dst_host", "unknown")
+        src_ip = data.get("ip_src", "unknown")
+        dst_ip = data.get("ip_dst", "unknown")
         bytes = data.get("bytes", 0)
 
         traffic_metric.labels(
