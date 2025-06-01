@@ -48,9 +48,11 @@ def main():
         ).set(bytes)
 
 
+print("Starting...")
 if __name__ == "__main__":
     while True:
         try:
+            print("Starting main")
             main()
         except Exception as e:
             print(f"Error: {e}")
