@@ -27,9 +27,6 @@ def main():
     )
     print(f"Subscribed to Kafka topic {KAFKA_TOPIC}")
 
-    print("Starting Prometheus HTTP server on port 9105...")
-    start_http_server(9105)
-
     print(f"Consuming Kafka topic {KAFKA_TOPIC}...")
     for message in consumer:
         data = message.value
@@ -53,6 +50,9 @@ def main():
 
 print("Starting...")
 if __name__ == "__main__":
+    print("Starting Prometheus HTTP server on port 9105...")
+    start_http_server(9105)
+
     while True:
         try:
             print("Starting main")
