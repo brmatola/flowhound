@@ -2,12 +2,20 @@ version: '3.8'
 
 services:
 
-  pmacctd:
+  pmacctd_wired:
     image: pmacct/pmacctd:bleeding-edge # need arm64 image
-    container_name: flowhound_pmacctd
+    container_name: flowhound_pmacctd_wired
     network_mode: host
     volumes:
-      - ./pmacctd.conf:/etc/pmacct/pmacctd.conf
+      - ./pmacctd/wired.conf:/etc/pmacct/pmacctd.conf
+    restart: unless-stopped
+
+  pmacctd_wifi:
+    image: pmacct/pmacctd:bleeding-edge # need arm64 image
+    container_name: flowhound_pmacctd_wifi
+    network_mode: host
+    volumes:
+      - ./pmacctd/wifi.conf:/etc/pmacct/pmacctd.conf
     restart: unless-stopped
   
   redpanda:

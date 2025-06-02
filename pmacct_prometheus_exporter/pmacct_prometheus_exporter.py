@@ -4,30 +4,35 @@ import time
 from kafka import KafkaConsumer
 from prometheus_client import start_http_server, Gauge
 from ip import get_direction
+import threading
 
 KAFKA_BROKER = os.getenv("KAFKA_BROKER", "redpanda:9092")
-KAFKA_TOPIC = "pmacct_flows"
+
+CONSUME_TOPICS = [
+    ("pmacct_wired", "wired"),
+    ("pmacct_wifi", "wifi"),
+]
 
 traffic_metric = Gauge(
     "pmacct_traffic_bytes_total",
     "Total bytes observed per flow",
-    ["src_mac", "src_ip", "dst_ip", "direction"]
+    ["src_mac", "src_ip", "dst_ip", "direction", "source"]
 )
 
 
-def main():
+def consume_topic(topic, source_label):
     print(f"Connecting to Kafka broker at {KAFKA_BROKER}")
     consumer = KafkaConsumer(
-        KAFKA_TOPIC,
+        topic,
         bootstrap_servers=KAFKA_BROKER,
         auto_offset_reset="earliest",
         enable_auto_commit=True,
         group_id="pmacct_prometheus_exporter",
         value_deserializer=lambda x: json.loads(x.decode("utf-8")),
     )
-    print(f"Subscribed to Kafka topic {KAFKA_TOPIC}")
+    print(f"Subscribed to Kafka topic {topic}")
 
-    print(f"Consuming Kafka topic {KAFKA_TOPIC}...")
+    print(f"Consuming Kafka topic {topic}...")
     for message in consumer:
         data = message.value
         if data.get("event_type") != "purge":
@@ -50,6 +55,7 @@ def main():
             src_ip=src_ip,
             dst_ip=dst_ip,
             direction=direction,
+            source=source_label,
         ).set(bytes)
 
 
@@ -61,7 +67,12 @@ if __name__ == "__main__":
     while True:
         try:
             print("Starting main")
-            main()
+            for topic, source_label in CONSUME_TOPICS:
+                t = threading.Thread(
+                    target=consume_topic, 
+                    args=(topic, source_label)
+                )
+                t.start()
         except Exception as e:
             print(f"Error: {e}")
             time.sleep(5)

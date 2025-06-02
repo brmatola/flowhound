@@ -12,42 +12,11 @@
     "panels": [
       {
         "type": "timeseries",
-        "title": "Top ${topn} MACs (Total Traffic)",
-        "targets": [
-          {
-            "expr": "topk(${topn}, increase(pmacct_traffic_bytes_total_by_mac[$__range]))",
-            "legendFormat": "{{src_mac}}",
-            "refId": "A"
-          }
-        ],
-        "fieldConfig": {
-          "defaults": {
-            "unit": "bytes",
-            "min": 0,
-            "custom": {
-              "drawStyle": "area",
-              "fillOpacity": 70,
-              "stacking": {
-                "mode": "normal"
-              }
-            }
-          },
-          "overrides": []
-        },
-        "gridPos": {
-          "h": 9,
-          "w": 24,
-          "x": 0,
-          "y": 0
-        }
-      },
-      {
-        "type": "timeseries",
         "title": "Top ${topn} Uploaders",
         "targets": [
           {
             "expr": "topk(${topn}, increase(pmacct_traffic_bytes_total_upload_by_src_ip[$__range]))",
-            "legendFormat": "{{src_ip}}",
+            "legendFormat": "{{src_ip}} {{source}}",
             "refId": "A"
           }
         ],
@@ -78,7 +47,7 @@
         "targets": [
           {
             "expr": "topk(${topn}, increase(pmacct_traffic_bytes_total_download_by_dst_ip[$__range]))",
-            "legendFormat": "{{dst_ip}}",
+            "legendFormat": "{{dst_ip}} {{source}}",
             "refId": "A"
           }
         ],
