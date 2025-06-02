@@ -34,12 +34,17 @@ def main():
             print(f"Skipping message: {data}")
             continue
 
-        src_mac = data.get("mac_src", "unknown")
-        src_ip = data.get("ip_src", "unknown")
-        dst_ip = data.get("ip_dst", "unknown")
+        src_mac = data.get("mac_src", "")
+        src_ip = data.get("ip_src", "")
+        dst_ip = data.get("ip_dst", "")
+
+        if not src_mac or not src_ip or not dst_ip:
+            continue
+
         direction = get_direction(src_ip, dst_ip)
         bytes = data.get("bytes", 0)
 
+        print(f"Processing message: {src_ip} {dst_ip} {direction} {bytes}")
         traffic_metric.labels(
             src_mac=src_mac,
             src_ip=src_ip,
