@@ -6,8 +6,6 @@ from prometheus_client import start_http_server, Gauge
 from ip import get_direction
 import threading
 
-KAFKA_BROKER = os.getenv("KAFKA_BROKER", "redpanda:9092")
-
 CONSUME_TOPICS = [
     ("pmacct_wired", "wired"),
     ("pmacct_wifi", "wifi"),
@@ -21,6 +19,7 @@ traffic_metric = Gauge(
 
 
 def consume_topic(topic, source_label):
+    KAFKA_BROKER = os.getenv("KAFKA_BROKER", "redpanda:9092")
     print(f"Connecting to Kafka broker at {KAFKA_BROKER}")
     consumer = KafkaConsumer(
         topic,
