@@ -58,20 +58,24 @@ def consume_topic(topic, source_label):
         ).set(bytes)
 
 
-print("Starting...")
 if __name__ == "__main__":
     print("Starting Prometheus HTTP server on port 9105...")
     start_http_server(9105)
 
-    while True:
-        try:
-            print("Starting main")
-            for topic, source_label in CONSUME_TOPICS:
-                t = threading.Thread(
-                    target=consume_topic, 
-                    args=(topic, source_label)
-                )
-                t.start()
-        except Exception as e:
-            print(f"Error: {e}")
-            time.sleep(5)
+    print("Starting main")
+    threads = []
+    for topic, source_label in CONSUME_TOPICS:
+        t = threading.Thread(
+            target=consume_topic,
+            args=(topic, source_label),
+            daemon=True
+        )
+        t.start()
+        threads.append(t)
+
+    # Keep alive
+    try:
+        while True:
+            time.sleep(1)
+    except KeyboardInterrupt:
+        print("Shutting down gracefully...")
