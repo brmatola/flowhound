@@ -2,6 +2,15 @@ version: '3.8'
 
 services:
 
+  wifi_hopper:
+    build:
+      context: ./wifi_hopper
+    container_name: flowhound_wifi_hopper
+    network_mode: host
+    privileged: true
+    restart: unless-stopped
+
+
   pmacctd_wired:
     image: pmacct/pmacctd:bleeding-edge # need arm64 image
     container_name: flowhound_pmacctd_wired
