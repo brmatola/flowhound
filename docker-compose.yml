@@ -17,7 +17,7 @@ services:
     network_mode: host
     privileged: true
     environment:
-      - KAFKA_BROKER=redpanda:9092
+      - KAFKA_BROKER=localhost:9092
       - KAFKA_TOPIC=pmacct_wifi
     restart: unless-stopped
 

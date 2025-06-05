@@ -3,7 +3,7 @@ import json
 import os
 from kafka import KafkaProducer
 
-KAFKA_BROKER = os.getenv("KAFKA_BROKER", "redpanda:9092")
+KAFKA_BROKER = os.getenv("KAFKA_BROKER", "localhost:9092")
 KAFKA_TOPIC = os.getenv("KAFKA_TOPIC", "pmacct_wifi")
 
 print(f"Connecting to Kafka broker at {KAFKA_BROKER}")
