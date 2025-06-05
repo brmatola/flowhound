@@ -10,6 +10,16 @@ services:
     privileged: true
     restart: unless-stopped
 
+  wifi_pcap_parser:
+    build:
+      context: ./pcap
+    container_name: flowhound_pcap_parser
+    network_mode: host
+    privileged: true
+    environment:
+      - KAFKA_BROKER=redpanda:9092
+      - KAFKA_TOPIC=pmacct_wifi
+    restart: unless-stopped
 
   pmacctd_wired:
     image: pmacct/pmacctd:bleeding-edge # need arm64 image
@@ -17,14 +27,6 @@ services:
     network_mode: host
     volumes:
       - ./pmacctd/wired.conf:/etc/pmacct/pmacctd.conf
-    restart: unless-stopped
-
-  pmacctd_wifi:
-    image: pmacct/pmacctd:bleeding-edge # need arm64 image
-    container_name: flowhound_pmacctd_wifi
-    network_mode: host
-    volumes:
-      - ./pmacctd/wifi.conf:/etc/pmacct/pmacctd.conf
     restart: unless-stopped
   
   redpanda:
