@@ -34,9 +34,6 @@ def consume_topic(topic, source_label):
     print(f"Consuming Kafka topic {topic}...")
     for message in consumer:
         data = message.value
-        if data.get("event_type") != "purge":
-            print(f"Skipping message: {data}")
-            continue
 
         src_mac = data.get("mac_src", "")
         src_ip = data.get("ip_src", "")
