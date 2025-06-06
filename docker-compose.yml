@@ -19,6 +19,7 @@ services:
     environment:
       - KAFKA_BROKER=localhost:9092
       - KAFKA_TOPIC=pmacct_wifi
+      - PYTHONUNBUFFERED=1
     restart: unless-stopped
 
   pmacctd_wired:
