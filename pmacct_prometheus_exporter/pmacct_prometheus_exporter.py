@@ -42,13 +42,13 @@ def consume_topic(topic, source_label):
         src_ip = data.get("ip_src", "")
         dst_ip = data.get("ip_dst", "")
 
-        if not src_mac or not src_ip or not dst_ip:
+        if not src_mac:
             continue
 
         direction = get_direction(src_ip, dst_ip)
         bytes = data.get("bytes", 0)
 
-        print(f"Processing message: {src_ip} {dst_ip} {direction} {bytes}")
+        print(f"Processing message: {topic} {direction} {src_mac} {bytes}")
         traffic_metric.labels(
             src_mac=src_mac,
             src_ip=src_ip,

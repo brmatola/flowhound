@@ -12,6 +12,37 @@
     "panels": [
       {
         "type": "timeseries",
+        "title": "Top ${topn} Data use by MAC",
+        "targets": [
+          {
+            "expr": "topk(${topn}, sum(rate(pmacct_traffic_bytes_total[$__range])) by (src_mac, source))",
+            "legendFormat": "{{src_mac}} {{source}}",
+            "refId": "A"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "bytes",
+            "min": 0,
+            "custom": {
+              "drawStyle": "area",
+              "fillOpacity": 70,
+              "stacking": {
+                "mode": "normal"
+              }
+            }
+          },
+          "overrides": []
+        },
+        "gridPos": {
+          "h": 9,
+          "w": 24,
+          "x": 0,
+          "y": 9
+        }
+      },
+      {
+        "type": "timeseries",
         "title": "Top ${topn} Uploaders",
         "targets": [
           {

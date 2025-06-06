@@ -17,14 +17,21 @@ def is_local(ip_str):
 
 
 def get_direction(src_ip, dst_ip):
-    src_local = is_local(src_ip)
-    dst_local = is_local(dst_ip)
+    try:
+        if not src_ip or not dst_ip:
+            return "unknown"
 
-    if src_local and dst_local:
-        return "internal"
-    elif src_local and not dst_local:
-        return "upload"
-    elif not src_local and dst_local:
-        return "download"
-    else:
-        return "external"  # NAT weirdness
+        src_local = is_local(src_ip)
+        dst_local = is_local(dst_ip)
+
+        if src_local and dst_local:
+            return "internal"
+        elif src_local and not dst_local:
+            return "upload"
+        elif not src_local and dst_local:
+            return "download"
+        else:
+            return "external"  # NAT weirdness
+    except Exception as e:
+        print(f"Error getting direction: {e}")
+        return "unknown"

@@ -20,23 +20,17 @@ for packet in capture.sniff_continuously():
     try:
         if 'WLAN' not in packet:
             continue
-        if 'IP' not in packet:
+
+        # Only process data frames
+        if int(packet.wlan.fc_type) != 2:
             continue
 
         src_mac = packet.wlan.sa if hasattr(packet.wlan, 'sa') else ''
-        src_ip = packet.ip.src if hasattr(packet.ip, 'src') else ''
-        dst_ip = packet.ip.dst if hasattr(packet.ip, 'dst') else ''
-        length = int(packet.length)
-
-        if not src_ip or not dst_ip:
-            continue
+        frame_len = int(packet.length)
 
         flow_record = {
             "mac_src": src_mac,
-            "ip_src": src_ip,
-            "ip_dst": dst_ip,
-            "bytes": length,
-            "event_type": "purge"
+            "bytes": frame_len
         }
 
         print(f"Sending flow: {flow_record}")
