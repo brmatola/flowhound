@@ -2,8 +2,7 @@ import json
 import os
 import time
 from kafka import KafkaConsumer
-from prometheus_client import start_http_server, Gauge
-from ip import get_direction
+from prometheus_client import start_http_server, Counter
 import threading
 
 CONSUME_TOPICS = [
@@ -11,10 +10,10 @@ CONSUME_TOPICS = [
     ("pmacct_wifi", "wifi"),
 ]
 
-traffic_metric = Gauge(
+traffic_metric = Counter(
     "pmacct_traffic_bytes_total",
     "Total bytes observed per flow",
-    ["src_mac", "src_ip", "dst_ip", "direction", "source"]
+    ["src_mac", "source"]
 )
 
 
@@ -36,21 +35,15 @@ def consume_topic(topic, source_label):
         data = message.value
 
         src_mac = data.get("mac_src", "")
-        src_ip = data.get("ip_src", "")
-        dst_ip = data.get("ip_dst", "")
 
         if not src_mac:
             continue
 
-        direction = get_direction(src_ip, dst_ip)
         bytes = data.get("bytes", 0)
 
-        print(f"Processing message: {topic} {direction} {src_mac} {bytes}")
+        print(f"Processing message: {topic} {src_mac} {bytes}")
         traffic_metric.labels(
             src_mac=src_mac,
-            src_ip=src_ip,
-            dst_ip=dst_ip,
-            direction=direction,
             source=source_label,
         ).set(bytes)
 

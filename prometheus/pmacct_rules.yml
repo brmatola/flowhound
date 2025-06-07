@@ -5,11 +5,3 @@ groups:
     # Traffic by MAC
     - record: pmacct_traffic_bytes_total_by_mac
       expr: sum(increase(pmacct_traffic_bytes_total[5m])) by (src_mac, source)
-    
-    # Uploads by src_ip
-    - record: pmacct_traffic_bytes_total_upload_by_src_ip
-      expr: sum(increase(pmacct_traffic_bytes_total{direction="upload"}[5m])) by (src_ip, source)
-    
-    # Downloads by dst_ip
-    - record: pmacct_traffic_bytes_total_download_by_dst_ip
-      expr: sum(increase(pmacct_traffic_bytes_total{direction="download"}[5m])) by (dst_ip, source)
