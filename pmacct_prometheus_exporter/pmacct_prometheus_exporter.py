@@ -45,7 +45,7 @@ def consume_topic(topic, source_label):
         traffic_metric.labels(
             src_mac=src_mac,
             source=source_label,
-        ).set(bytes)
+        ).inc(bytes)
 
 
 if __name__ == "__main__":
