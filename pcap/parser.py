@@ -1,10 +1,18 @@
 import pyshark
 import json
 import os
+import subprocess
+import time
 from kafka import KafkaProducer
 
 KAFKA_BROKER = os.getenv("KAFKA_BROKER", "localhost:9092")
 KAFKA_TOPIC = os.getenv("KAFKA_TOPIC", "pmacct_wifi")
+
+CHANNELS_24 = ["11"]
+CHANNELS_5 = ["157"]
+CHANNELS = CHANNELS_24 + CHANNELS_5
+DWELL = 3 # seconds per channel
+IFACE = "mon0"
 
 print(f"Connecting to Kafka broker at {KAFKA_BROKER}")
 producer = KafkaProducer(
@@ -12,29 +20,48 @@ producer = KafkaProducer(
     value_serializer=lambda v: json.dumps(v).encode("utf-8")
 )
 
-# Open a live capture on mon0 (or from a pcap file if testing)
-capture = pyshark.LiveCapture(interface='mon0')
 
-print("Starting Wi-Fi packet parsing...")
-for packet in capture.sniff_continuously():
+def set_channel(channel):
+    print(f"[{time.strftime('%Y-%m-%d %H:%M:%S')}] Switching {IFACE} to channel {channel}")
     try:
-        if 'WLAN' not in packet:
-            continue
+        subprocess.run(["iw", "dev", IFACE, "set", "channel", channel], check=True)
+    except subprocess.CalledProcessError as e:
+        print(f"Error switching channel: {e}")
 
-        # Only process data frames
-        if int(packet.wlan.fc_type) != 2:
-            continue
 
-        src_mac = packet.wlan.sa if hasattr(packet.wlan, 'sa') else ''
-        frame_len = int(packet.length)
+while True:
+    for channel in CHANNELS:
+        set_channel(channel)
 
-        flow_record = {
-            "mac_src": src_mac,
-            "bytes": frame_len
-        }
+        capture = pyshark.LiveCapture(interface=IFACE)
 
-        print(f"Sending flow: {flow_record}")
-        producer.send(KAFKA_TOPIC, flow_record)
+        print(f"Listening on {IFACE} for {channel}...")
 
-    except Exception as e:
-        print(f"Error processing packet: {e}")
+        try:
+            capture.sniff(timeout=DWELL)
+            for packet in capture:
+                try:
+                    if 'WLAN' not in packet:
+                        continue
+
+                    if int(packet.wlan.fc_type) != 2:
+                        continue
+
+                    src_mac = packet.wlan.sa if hasattr(packet.wlan, 'sa') else ''
+                    frame_len = int(packet.length)
+
+                    flow_record = {
+                        "mac_src": src_mac,
+                        "bytes": frame_len
+                    }
+
+                    print(f"Sending flow: {flow_record}")
+
+                    print(f"Sending flow: {flow_record}")
+                    producer.send(KAFKA_TOPIC, flow_record)
+                except Exception as e:
+                    print(f"Error processing packet: {e}")
+        except Exception as e:
+            print(f"Error processing capture: {e}")
+        finally:
+            capture.close()
